@@ -13,6 +13,7 @@ function App() {
   const [supportedLanguages, setSupportedLanguages] = useState([]);
   const [isLanguageLoading, setIsLanguageLoading] = useState(true);
 
+
   useEffect(() => {
     fetch(`${API_URL}/languages`)
       .then(res => {
@@ -30,7 +31,7 @@ function App() {
       .finally(() => {
         setIsLanguageLoading(false);
       });
-  }, []);
+
 
   return (
     <BrowserRouter>
