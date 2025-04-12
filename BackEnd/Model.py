@@ -10,17 +10,14 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 import json
-from googletrans import Translator
 import asyncio
+from Translator import translate_text
 
 # Initialize Groq chat model
 llm = ChatGroq(
     groq_api_key = os.environ["GROQ_API_KEY"],
     model_name = "llama3-8b-8192",
 )
-
-# Translator
-translator = Translator()
 
 
 
@@ -66,7 +63,7 @@ chain = prompt | llm | parser
 # 🌍 Translator Agent function
 async def translate_and_respond(user_input, input_language_code):
     # Step 1: Translate to English
-    translated_to_english = (await translator.translate(user_input, src=input_language_code, dest='en')).text
+    translated_to_english = (await translate_text(user_input, src=input_language_code, dest='en')).text
     print(f"\n[Translated to English]: {translated_to_english}")
 
     # Step 2: Run through assistant chain
@@ -83,10 +80,10 @@ async def translate_and_respond(user_input, input_language_code):
     consult_text = ";".join(assistant_reply_english["consult"])
 
     # Step 4: Translate all text at once
-    translated_name = (await translator.translate(name_text, src='en', dest=input_language_code)).text
-    translated_remedies = (await translator.translate(remedies_text, src='en', dest=input_language_code)).text
-    translated_advice = (await translator.translate(advice_text, src='en', dest=input_language_code)).text
-    translated_consult_text = (await translator.translate(consult_text, src='en', dest=input_language_code)).text
+    translated_name = (await translate_text(name_text, src='en', dest=input_language_code)).text
+    translated_remedies = (await translate_text(remedies_text, src='en', dest=input_language_code)).text
+    translated_advice = (await translate_text(advice_text, src='en', dest=input_language_code)).text
+    translated_consult_text = (await translate_text(consult_text, src='en', dest=input_language_code)).text
 
     # Step 5: Parse the translated text back into dictionary structure
 
