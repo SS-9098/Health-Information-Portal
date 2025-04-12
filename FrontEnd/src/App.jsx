@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://health-information-portal.onrender.com';
 
 function App() {
   const [messages, setMessages] = useState([]);
