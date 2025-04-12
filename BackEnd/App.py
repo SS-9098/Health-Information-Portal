@@ -43,18 +43,51 @@ class HealthResponse(BaseModel):
     original_language: str
 
 
-# Translator function
-
 # Endpoints
 @app.get("/")
 async def root():
     return {"message": "Healthcare Assistant API"}
 
 
+@app.get("/languages")
+async def get_languages():
+    # Common language codes
+    languages = {
+        "en": "english",
+        "hi": "hindi",
+        "bn": "bengali",
+        "te": "telugu",
+        "ta": "tamil",
+        "mr": "marathi",
+        "gu": "gujarati",
+        "kn": "kannada",
+        "ml": "malayalam",
+        "pa": "punjabi"
+    }
+    return {"languages": list(languages.values())}
+
+
 @app.post("/health-advice", response_model=HealthResponse)
 async def get_health_advice(request: HealthRequest):
     try:
-        result = await translate_and_respond(request.symptoms, request.language_code)
+        # Map language names to ISO codes if needed
+        language_map = {
+            "english": "en",
+            "hindi": "hi",
+            "bengali": "bn",
+            "telugu": "te",
+            "tamil": "ta",
+            "marathi": "mr",
+            "gujarati": "gu",
+            "kannada": "kn",
+            "malayalam": "ml",
+            "punjabi": "pa"
+        }
+
+        lang_code = language_map.get(request.language_code.lower(), request.language_code)
+
+        result = await translate_and_respond(request.symptoms, lang_code, chain)
+        result["original_language"] = lang_code
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
@@ -62,4 +95,4 @@ async def get_health_advice(request: HealthRequest):
 
 # Run the server
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("App:app", host="0.0.0.0", port=8000, reload=True)
