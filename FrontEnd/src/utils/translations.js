@@ -2,7 +2,7 @@
 const translations = {
   english: {
        nativeName: "English",
-    appTitle: "Rural India AI Assistant",
+    appTitle: "Arogayavani",
     selectLanguage: "Select Your Preferred Language",
     languageLabel: "Language",
     changeLanguage: "Change",
