@@ -73,23 +73,33 @@ async def translate_and_respond(user_input, input_language_code):
     assistant_reply_english = chain.invoke({"input": translated_to_english})
     print(f"\n[Assistant reply in English]: {assistant_reply_english}")
 
-    # Step 3: Translate each value in the dictionary back to input language
-    translated_response = {}
+    # Step 3: Combine all texts with semicolons as separators
+    name_text = assistant_reply_english["name"]
 
-    # Translate name field
-    translated_response["name"] = (await translator.translate(
-        assistant_reply_english["name"], src='en', dest=input_language_code)).text
+    remedies_text = ";".join(assistant_reply_english["remedies"])
 
-    # Translate each item in the arrays
-    for key in ["remedies", "advice", "consult"]:
-        translated_response[key] = []
-        for item in assistant_reply_english[key]:
-            translated_item = (await translator.translate(
-                item, src='en', dest=input_language_code)).text
-            translated_response[key].append(translated_item)
+    advice_text = ";".join(assistant_reply_english["advice"])
 
-    return translated_response
+    consult_text = ";".join(assistant_reply_english["consult"])
 
+    # Step 4: Translate all text at once
+    translated_name = (await translator.translate(name_text, src='en', dest=input_language_code)).text
+    translated_remedies = (await translator.translate(remedies_text, src='en', dest=input_language_code)).text
+    translated_advice = (await translator.translate(advice_text, src='en', dest=input_language_code)).text
+    translated_consult_text = (await translator.translate(consult_text, src='en', dest=input_language_code)).text
+
+    # Step 5: Parse the translated text back into dictionary structure
+
+    translated_remedies = translated_remedies.split(";")
+    translated_advice = translated_advice.split(";")
+    translated_consult = translated_consult_text.split(";")
+
+    return {
+        "name": translated_name,
+        "remedies": translated_remedies,
+        "advice": translated_advice,
+        "consult": translated_consult
+    }
 
 # 🌟 Example usage
 input_text = "मुझे दो दिनों से बुखार, बदन दर्द और हल्की खांसी है।"  # Hindi
