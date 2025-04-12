@@ -66,6 +66,16 @@ async def get_languages():
     }
     return {"languages": list(languages.values())}
 
+@app.post("/translate")
+async def translate_text_endpoint(text: str, src: str, dest: str):
+    try:
+        translation = await translate_text(text, src, dest)
+        if translation:
+            return {"translated_text": translation.text}
+        else:
+            raise HTTPException(status_code=500, detail="Translation failed.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error during translation: {str(e)}")
 
 @app.post("/health-advice", response_model=HealthResponse)
 async def get_health_advice(request: HealthRequest):

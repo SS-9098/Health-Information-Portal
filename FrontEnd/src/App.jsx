@@ -14,6 +14,73 @@ function App() {
   const [isLanguageLoading, setIsLanguageLoading] = useState(true);
   const [micPermission, setMicPermission] = useState('prompt');
 
+  const translations = {
+        english: {
+          condition: "Possible Condition:",
+          remedies: "Home Remedies:",
+          advice: "Advice:",
+          consult: "When to Consult:"
+        },
+        hindi: {
+          condition: "संभावित स्थिति:",
+          remedies: "घरेलू उपचार:",
+          advice: "सलाह:",
+          consult: "डॉक्टर से कब परामर्श करें:"
+        },
+        bengali: {
+          condition: "সম্ভাব্য অবস্থা:",
+          remedies: "ঘরোয়া প্রতিকার:",
+          advice: "পরামর্শ:",
+          consult: "কখন ডাক্তার দেখাবেন:"
+        },
+        telugu: {
+          condition: "సాధ్యమైన పరిస్థితి:",
+          remedies: "ఇంటి నివారణలు:",
+          advice: "సలహా:",
+          consult: "వైద్యుడిని సంప్రదించాల్సిన సమయం:"
+        },
+        tamil: {
+          condition: "சாத்தியமான நிலைமை:",
+          remedies: "வீட்டு மருத்துவம்:",
+          advice: "அறிவுரை:",
+          consult: "மருத்துவரை அணுக வேண்டிய நேரம்:"
+        },
+        marathi: {
+          condition: "संभाव्य स्थिती:",
+          remedies: "घरगुती उपचार:",
+          advice: "सल्ला:",
+          consult: "डॉक्टरांचा सल्ला केव्हा घ्यावा:"
+        },
+        gujarati: {
+          condition: "સંભવિત સ્થિતિ:",
+          remedies: "ઘરેલુ ઉપચારો:",
+          advice: "સલાહ:",
+          consult: "ડૉક્ટરની સલાહ ક્યારે લેવી:"
+        },
+        kannada: {
+          condition: "ಸಂಭಾವ್ಯ ಸ್ಥಿತಿ:",
+          remedies: "ಮನೆಮದ್ದುಗಳು:",
+          advice: "ಸಲಹೆ:",
+          consult: "ವೈದ್ಯರನ್ನು ಯಾವಾಗ ಸಂಪರ್ಕಿಸಬೇಕು:"
+        },
+        malayalam: {
+          condition: "സാധ്യമായ അവസ്ഥ:",
+          remedies: "വീട്ടുവൈദ്യം:",
+          advice: "ഉപദേശം:",
+          consult: "എപ്പോൾ ഡോക്ടറെ കാണണം:"
+        },
+        punjabi: {
+          condition: "ਸੰਭਾਵਿਤ ਸਥਿਤੀ:",
+          remedies: "ਘਰੇਲੂ ਇਲਾਜ:",
+          advice: "ਸਲਾਹ:",
+          consult: "ਡਾਕਟਰ ਨੂੰ ਕਦੋਂ ਮਿਲਣਾ ਹੈ:"
+        },
+        // Add other languages as needed
+      };
+
+      // Use English as fallback if translation isn't available
+      const headerTexts = translations[language.toLowerCase()] || translations.english;
+
   const messagesEndRef = useRef(null);
   const recognition = useRef(null);
 
@@ -171,13 +238,13 @@ function App() {
       const formattedResponse = `
 **${data.name}**
 
-**Home Remedies:**
+**${headerTexts.remedies}**
 ${data.remedies.map(r => `• ${r}`).join('\n')}
 
-**Advice:**
+**${headerTexts.advice}**
 ${data.advice.map(a => `• ${a}`).join('\n')}
 
-**When to Consult:**
+**${headerTexts.consult}**
 ${data.consult.map(c => `• ${c}`).join('\n')}`;
 
       const botMessage = {
