@@ -257,7 +257,7 @@ ${data.consult.map(c => `• ${c}`).join('\n')}`;
       setMessages(prev => [...prev, botMessage]);
     } catch (err) {
       console.error('Error:', err);
-      setError('Failed to get response. Please try again.');
+      setError('Server is starting, Please wait a few seconds');
     } finally {
       setIsLoading(false);
     }
