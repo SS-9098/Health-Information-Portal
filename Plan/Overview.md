@@ -1,0 +1,8 @@
+- Let user select language
+- Convert interface to that language
+- Take Voice Input in any language
+- Inputs include symptoms and prescription
+- Convert to English
+- Give input to gpt-4o and generate disease name and treatment method
+- Convert output to initial language
+- Voice out output
