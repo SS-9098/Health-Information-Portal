@@ -24,10 +24,15 @@ The Health Information Portal is designed to provide accessible and reliable hea
 
 The project is built using the following technologies:
 
-- **JavaScript**: Frontend development (63.4%)
-- **Python**: Backend development and APIs (32.5%)
-- **CSS**: Styling and layout design (2.6%)
-- **HTML**: Structure of web pages (1.5%)
+- **Core languages**- *Python, javascript, HTML, CSS*
+- **Base LLM**- *llama3-8b-8192*
+- **Backend Libraries**- *googletrans, gTTS, asyncio, bs4, transformers, langchain-groq*
+- **Backend Framework**- *FastAPI*
+- **Backend Deployment**- *Render*
+- **Frontend Libraries**- *React, Vite, Tailwind CSS*
+- **Frontend Deployment**- *Vercel*
+- **Training DataSets**- https://www.kaggle.com/code/nandhanasuresh/disease-classification-using-symptoms/input  
+                         https://www.kaggle.com/code/plarmuseau/symptom-disease-recommender
 
 ## Installation
 
