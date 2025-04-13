@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from './LoadingIndicator';
 import translations from '../utils/translations';
 
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = 'https://health-information-portal.onrender.com';
 
 function ChatInterface({ language }) {
   const navigate = useNavigate();
