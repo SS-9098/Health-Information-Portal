@@ -5,7 +5,7 @@ import LanguageSelector from './components/LanguageSelector';
 import ChatInterface from './components/ChatInterface';
 import './App.css';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://health-information-portal.onrender.com';
 
 function App() {
   const [language, setLanguage] = useState(null);
