@@ -3,7 +3,7 @@
   import LoadingIndicator from './LoadingIndicator';
   import translations from '../utils/translations';
 
-  const API_URL = 'https://health-information-portal.onrender.com';
+  const API_URL = 'http://localhost:8000';
 
   function ChatInterface({ language }) {
     const navigate = useNavigate();
@@ -14,6 +14,7 @@
     const [error, setError] = useState(null);
     const [isListening, setIsListening] = useState(false);
     const [micPermission, setMicPermission] = useState('prompt');
+    const [followupQuestion, setFollowupQuestion] = useState(null);
 
     const messagesEndRef = useRef(null);
     const recognition = useRef(null);
@@ -73,7 +74,7 @@
     // Scroll to bottom when messages change
     useEffect(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    }, [messages, followupQuestion]);
 
     const toggleListening = () => {
       if (!recognition.current) {
@@ -132,6 +133,7 @@
       setInput('');
       setIsLoading(true);
       setError(null);
+      setFollowupQuestion(null);
 
       try {
         const response = await fetch(`${API_URL}/health-advice`, {
@@ -167,6 +169,11 @@
         };
 
         setMessages(prev => [...prev, botMessage]);
+        
+        // Set followup question if it exists
+        if (data.followup_question) {
+          setFollowupQuestion(data.followup_question);
+        }
       } catch (err) {
         console.error('Error:', err);
         setError(t.serverStarting);
@@ -175,8 +182,22 @@
       }
     };
 
+    const handleFollowupResponse = () => {
+      if (followupQuestion) {
+        handleSend();
+      }
+    };
+
     const changeLanguage = () => {
       navigate('/');
+    };
+
+    // Handle followup question response
+    const answerFollowup = (answer) => {
+      setInput(answer);
+      setTimeout(() => {
+        handleSend();
+      }, 100);
     };
 
     return (
@@ -219,6 +240,36 @@
               </div>
             ))
           )}
+          
+          {followupQuestion && (
+            <div className="flex justify-start">
+              <div className="max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-lg px-4 py-2 bg-blue-100 text-gray-800 border border-blue-300">
+                <p className="font-semibold mb-2">{t.followupQuestion || "Follow-up Question"}:</p>
+                <p className="whitespace-pre-line">{followupQuestion}</p>
+                <div className="mt-3 flex space-x-2">
+                  <button 
+                    onClick={() => answerFollowup("Yes")}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  >
+                    {t.yes || "Yes"}
+                  </button>
+                  <button 
+                    onClick={() => answerFollowup("No")}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  >
+                    {t.no || "No"}
+                  </button>
+                  <button 
+                    onClick={() => setFollowupQuestion(null)}
+                    className="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400"
+                  >
+                    {t.dismiss || "Dismiss"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {isLoading && <LoadingIndicator />}
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
@@ -234,7 +285,7 @@
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={t.inputPlaceholder}
+              placeholder={followupQuestion ? t.typeResponse || "Type your response..." : t.inputPlaceholder}
               className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             />
@@ -258,7 +309,7 @@
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
               disabled={isLoading || !input.trim()}
             >
-              {t.send}
+              {followupQuestion ? t.respond || "Respond" : t.send}
             </button>
           </div>
         </form>

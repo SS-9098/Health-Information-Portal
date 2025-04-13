@@ -4,7 +4,7 @@ import nest_asyncio
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import uvicorn
 
 # Import from your existing modules
@@ -40,6 +40,7 @@ class HealthResponse(BaseModel):
     remedies: List[str]
     advice: List[str]
     consult: List[str]
+    followup_question: Optional[str] = None
     original_language: str
 
 

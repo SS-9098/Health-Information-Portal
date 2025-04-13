@@ -32,6 +32,10 @@ parser = JsonOutputParser(pydantic_object={
         "consult": {
             "type": "array",
             "items": {"type": "string"}
+        },
+        "followup_question": {
+            "type": "string",
+            "description": "Optional follow-up question to ask the user for more information"
         }
     }
 })
@@ -43,6 +47,10 @@ prompt = ChatPromptTemplate.from_messages([
                 2. Simple home remedies
                 3. General advice
                 4. When to consult a doctor
+                5. If needed, include ONE follow-up question to gather more information from the user
+
+                If the symptoms are vague or you need more information to provide accurate advice, 
+                include a clear follow-up question in the followup_question field.
 
                 Respond in this structure:
         {{
@@ -50,13 +58,14 @@ prompt = ChatPromptTemplate.from_messages([
             "remedies": ["remedy1", "remedy2", "remedy3"],
             "advice": ["advice1", "advice2", "advice3"],
             "consult": ["consult1", "consult2", "consult3"],
+            "followup_question": "Optional: A single follow-up question if you need more information"
         }}"""),
     ("user", "{input}")
 ])
 chain = prompt | llm | parser
 
 # 🌟 Example usage
-input_text = "मुझे दो दिनों से बुखार, बदन दर्द और हल्की खांसी है।"  # Hindi
+input_text = "मुझे दो दिनों से बुखार, बदन दर्द औ�� हल्की खांसी है।"  # Hindi
 language_code = "hi"  # ISO code for Hindi
 
 # Instead of asyncio.run, directly call the async function using await
