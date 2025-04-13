@@ -1,4 +1,3 @@
-// FrontEnd/src/utils/translations.js
 const translations = {
   english: {
        nativeName: "English",
@@ -22,7 +21,7 @@ const translations = {
   },
   hindi: {
     nativeName: "हिंदी",
-    appTitle: "ग्रामीण भारत एआई सहायक",
+    appTitle: "आरोग्यवाणी",
     selectLanguage: "अपनी पसंदीदा भाषा चुनें",
     languageLabel: "भाषा",
     changeLanguage: "बदलें",
@@ -42,7 +41,7 @@ const translations = {
   },
   bengali: {
       nativeName: "বাংলা",
-    appTitle: "গ্রামীণ ভারত এআই সহকারী",
+    appTitle: "আরোগ্যবাণী",
     selectLanguage: "আপনার পছন্দের ভাষা নির্বাচন করুন",
     languageLabel: "ভাষা",
     changeLanguage: "পরিবর্তন করুন",
@@ -62,7 +61,7 @@ const translations = {
   },
   telugu: {
       nativeName: "తెలుగు",
-    appTitle: "గ్రామీణ భారత AI సహాయకుడు",
+    appTitle: "ఆరోగ్యవాణి",
     selectLanguage: "మీకు కావలసిన భాషను ఎంచుకోండి",
     languageLabel: "భాష",
     changeLanguage: "మార్చు",
@@ -82,7 +81,7 @@ const translations = {
   },
   tamil: {
       nativeName: "தமிழ்",
-    appTitle: "கிராமப்புற இந்தியா AI உதவியாளர்",
+    appTitle: "ஆரோக்யவாணி",
     selectLanguage: "உங்கள் விருப்பமான மொழியைத் தேர்ந்தெடுக்கவும்",
     languageLabel: "மொழி",
     changeLanguage: "மாற்று",
@@ -102,7 +101,7 @@ const translations = {
   },
   marathi: {
       nativeName: "मराठी",
-    appTitle: "ग्रामीण भारत AI सहाय्यक",
+    appTitle: "आरोग्यवाणी",
     selectLanguage: "आपली पसंतीची भाषा निवडा",
     languageLabel: "भाषा",
     changeLanguage: "बदला",
@@ -122,7 +121,7 @@ const translations = {
   },
   gujarati: {
       nativeName: "ગુજરાતી",
-    appTitle: "ગ્રામીણ ભારત AI સહાયક",
+    appTitle: "આરોગ્યવાણી",
     selectLanguage: "તમારી પસંદગીની ભાષા પસંદ કરો",
     languageLabel: "ભાષા",
     changeLanguage: "બદલો",
@@ -142,7 +141,7 @@ const translations = {
   },
   kannada: {
       nativeName: "ಕನ್ನಡ",
-    appTitle: "ಗ್ರಾಮೀಣ ಭಾರತ AI ಸಹಾಯಕ",
+    appTitle: "ಆರೋಗ್ಯವಾಣಿ",
     selectLanguage: "ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",
     languageLabel: "ಭಾಷೆ",
     changeLanguage: "ಬದಲಾಯಿಸಿ",
@@ -162,7 +161,7 @@ const translations = {
   },
   malayalam: {
       nativeName: "മലയാളം",
-    appTitle: "ഗ്രാമീണ ഇന്ത്യ AI സഹായി",
+    appTitle: "ആരോഗ്യവാണി",
     selectLanguage: "നിങ്ങളുടെ ഇഷ്ടമുള്ള ഭാഷ തിരഞ്ഞെടുക്കുക",
     languageLabel: "ഭാഷ",
     changeLanguage: "��ാറ്റുക",
@@ -182,7 +181,7 @@ const translations = {
   },
   punjabi: {
       nativeName: "ਪੰਜਾਬੀ",
-    appTitle: "ਪੇਂਡੂ ਭਾਰਤ AI ਸਹਾਇਕ",
+    appTitle: "ਆਰੋਗਿਆਵਾਣੀ",
     selectLanguage: "ਆਪਣੀ ਪਸੰਦੀਦਾ ਭਾਸ਼ਾ ਚੁਣੋ",
     languageLabel: "ਭਾਸ਼ਾ",
     changeLanguage: "ਬਦਲੋ",

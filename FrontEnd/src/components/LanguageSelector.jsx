@@ -1,10 +1,8 @@
-// FrontEnd/src/components/LanguageSelector.jsx
       import { useNavigate } from 'react-router-dom';
       import translations from '../utils/translations';
 
       function LanguageSelector({ supportedLanguages, isLoading, setLanguage }) {
         const navigate = useNavigate();
-        // Default to English until language is selected
         const t = translations.english;
 
         const handleLanguageSelect = (selectedLanguage) => {

@@ -1,7 +1,6 @@
-// FrontEnd/src/components/Header.jsx
 import React from 'react';
 import translations from '../utils/translations';
-import logo from '../assets/logo.jpg'; // Update path to your actual logo
+import logo from '../assets/logo.jpg';
 
 function Header({ language }) {
   const t = translations[language?.toLowerCase()] || translations.english;

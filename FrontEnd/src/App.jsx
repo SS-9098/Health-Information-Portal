@@ -1,4 +1,3 @@
-// FrontEnd/src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
@@ -6,7 +5,7 @@ import LanguageSelector from './components/LanguageSelector';
 import ChatInterface from './components/ChatInterface';
 import './App.css';
 
-const API_URL = 'https://health-information-portal.onrender.com';
+const API_URL = 'http://localhost:8000';
 
 function App() {
   const [language, setLanguage] = useState(null);

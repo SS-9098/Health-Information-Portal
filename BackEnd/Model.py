@@ -55,16 +55,12 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 chain = prompt | llm | parser
 
-# 🌟 Example usage
-input_text = "मुझे दो दिनों से बुखार, बदन दर्द और हल्की खांसी है।"  # Hindi
-language_code = "hi"  # ISO code for Hindi
+input_text = "मुझे दो दिनों से बुखार, बदन दर्द और हल्की खांसी है।"
+language_code = "hi"
 
-# Instead of asyncio.run, directly call the async function using await
-# within a new async function.
 async def main():
     translated_response = await translate_and_respond(input_text, language_code, chain)
     print(f"\n[Final reply in {language_code}]: {translated_response}")
 
-# Run the main async function using asyncio.get_event_loop().run_until_complete
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(main())

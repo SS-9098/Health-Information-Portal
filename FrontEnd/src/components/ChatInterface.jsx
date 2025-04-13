@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from './LoadingIndicator';
 import translations from '../utils/translations';
 
-const API_URL = 'https://health-information-portal.onrender.com';
+const API_URL = 'http://127.0.0.1:8000';
 
 function ChatInterface({ language }) {
   const navigate = useNavigate();
@@ -16,62 +16,31 @@ function ChatInterface({ language }) {
   const [micPermission, setMicPermission] = useState('prompt');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
-  const [voicesLoaded, setVoicesLoaded] = useState(false);
-  const [speechInterval, setSpeechInterval] = useState(null);
+  const [audioPlayer, setAudioPlayer] = useState(null);
 
   const messagesEndRef = useRef(null);
   const recognition = useRef(null);
+
   useEffect(() => {
-  if (!window.speechSynthesis) return;
+    const audio = new Audio();
+    audio.onended = () => {
+      setIsSpeaking(false);
+      setSpeakingMessageId(null);
+    };
+    audio.onerror = () => {
+      setIsSpeaking(false);
+      setSpeakingMessageId(null);
+    };
+    setAudioPlayer(audio);
 
-  // Create a more robust voice loading function
-  const loadVoices = () => {
-    const voices = window.speechSynthesis.getVoices();
-    console.log("Voices loaded:", voices.length);
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.src = '';
+      }
+    };
+  }, []);
 
-    if (voices.length > 0) {
-      setVoicesLoaded(true);
-      return true;
-    }
-    return false;
-  };
-
-  // Try immediate loading
-  if (loadVoices()) return;
-
-  // Set up event listener
-  window.speechSynthesis.onvoiceschanged = loadVoices;
-
-  // Chrome sometimes needs a "kick" to load voices
-  window.speechSynthesis.cancel();
-
-  // For testing only - auto try forcing voices
-  // Uncomment if needed: setTimeout(forceVoiceLoad, 1000);
-
-  return () => {
-    window.speechSynthesis.onvoiceschanged = null;
-  };
-}, []);
-  // Add this function to your component
-const forceVoiceLoad = () => {
-  // Create a silent utterance to force voice loading
-  const utterance = new SpeechSynthesisUtterance('');
-  utterance.volume = 0; // Silent
-  utterance.rate = 1;
-  utterance.onend = () => {
-    // Check if voices are now available
-    const voices = window.speechSynthesis.getVoices();
-    console.log("Voices after user interaction:", voices.length);
-    if (voices.length > 0) {
-      setVoicesLoaded(true);
-    }
-  };
-
-  // This forces Chrome to load voices
-  window.speechSynthesis.speak(utterance);
-};
-
-  // Initialize speech recognition
   useEffect(() => {
     const initSpeechRecognition = () => {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -123,178 +92,56 @@ const forceVoiceLoad = () => {
     };
   }, [t]);
 
-  // Initialize and load voices
-  useEffect(() => {
-    if (!window.speechSynthesis) {
-      console.error("Speech synthesis not supported");
-      return;
-    }
-
-    // Force voice loading with multiple attempts
-    let attempts = 0;
-    let voiceLoadTimer = null;
-
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      console.log(`Attempt ${attempts+1}: Voices loaded:`, voices.length);
-
-      if (voices.length > 0) {
-        setVoicesLoaded(true);
-        clearTimeout(voiceLoadTimer);
-
-        // Log available languages
-        const langSet = new Set();
-        voices.forEach(voice => {
-          langSet.add(voice.lang.split('-')[0]);
-          console.log(`Voice: ${voice.name}, Lang: ${voice.lang}`);
-        });
-        console.log("Available languages:", [...langSet]);
-
-      } else if (attempts < 10) {
-        // Try again with increasing delays
-        attempts++;
-        const delay = attempts * 100;
-        voiceLoadTimer = setTimeout(loadVoices, delay);
-      }
-    };
-
-    // Set up the onvoiceschanged event
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-
-    // Initial try
-    loadVoices();
-
-    // One more attempt after 1 second
-    setTimeout(loadVoices, 1000);
-
-    return () => {
-      if (voiceLoadTimer) clearTimeout(voiceLoadTimer);
-    };
-  }, []);
-
-  // Function to speak text
-  const speakText = (text, messageId) => {
-    // Check if speech synthesis is supported
-    if (!window.speechSynthesis) {
-      console.error("Speech synthesis not supported");
-      setError("Speech synthesis not supported in your browser");
-      return;
-    }
-
-    // Stop any ongoing speech
-    window.speechSynthesis.cancel();
-    if (speechInterval) {
-      clearInterval(speechInterval);
-      setSpeechInterval(null);
-    }
-
-    // Toggle off if already speaking this message
+  const speakText = async (text, messageId) => {
+    // If already speaking the same message, stop it
     if (isSpeaking && messageId === speakingMessageId) {
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.src = '';
+      }
       setIsSpeaking(false);
       setSpeakingMessageId(null);
       return;
     }
 
-    // Clean text by removing markdown
+    // Clean the text (remove markdown)
     const cleanText = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/•/g, '');
     console.log("Speaking text:", cleanText);
 
-    // Create speech synthesis utterance
-    const utterance = new SpeechSynthesisUtterance(cleanText);
+    try {
+      setIsSpeaking(true);
+      setSpeakingMessageId(messageId);
 
-    // Get available voices
-    const voices = window.speechSynthesis.getVoices();
-    console.log(`Found ${voices.length} voices`);
+      // Call the TTS endpoint
+      const response = await fetch(`${API_URL}/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: cleanText,
+          language_code: language
+        }),
+      });
 
-    // If no voices at all, alert the user
-    if (voices.length === 0) {
-      setError("No speech voices available in your browser");
-      return;
-    }
+      if (!response.ok) {
+        throw new Error('TTS request failed');
+      }
 
-    // Map language codes to BCP 47 language tags
-    const langMap = {
-      'english': 'en',
-      'hindi': 'hi',
-      'bengali': 'bn',
-      'telugu': 'te',
-      'tamil': 'ta',
-      'marathi': 'mr',
-      'gujarati': 'gu',
-      'kannada': 'kn',
-      'malayalam': 'ml',
-      'punjabi': 'pa'
-    };
+      // Get the audio blob and create an object URL
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
 
-    // Get language code
-    const langCode = langMap[language.toLowerCase()] || 'en';
-    console.log("Selected language code:", langCode);
-
-    // Try to find a language match - first exact match, then close match, then default to first voice
-    const exactMatch = voices.find(v => v.lang === langCode);
-    const closeMatch = voices.find(v => v.lang.startsWith(langCode));
-    const defaultVoice = voices[0];
-
-    const selectedVoice = exactMatch || closeMatch || defaultVoice;
-
-    console.log("Using voice:", selectedVoice.name);
-    utterance.voice = selectedVoice;
-
-    // Set language (even if no matching voice)
-    utterance.lang = langCode;
-
-    // Set rate and pitch for better understanding
-    utterance.rate = 0.9;  // slightly slower
-    utterance.pitch = 1.0; // normal pitch
-
-    // Set speaking states
-    setIsSpeaking(true);
-    setSpeakingMessageId(messageId);
-
-    // Handle speech end
-    utterance.onend = () => {
-      console.log("Speech ended");
+      if (audioPlayer) {
+        audioPlayer.src = audioUrl;
+        await audioPlayer.play();
+      }
+    } catch (err) {
+      console.error('TTS Error:', err);
+      setError(t.ttsError || "Error generating speech");
       setIsSpeaking(false);
       setSpeakingMessageId(null);
-    };
-
-    // Handle speech error
-    utterance.onerror = (event) => {
-      console.error("Speech error:", event);
-      setIsSpeaking(false);
-      setSpeakingMessageId(null);
-      setError("Error speaking text");
-    };
-
-    // Start speaking
-    window.speechSynthesis.speak(utterance);
-    console.log("Speech started");
-
-    // Chrome workaround - keep speech alive
-    if (navigator.userAgent.includes('Chrome')) {
-      clearInterval(speechInterval);
-      const intervalId = setInterval(() => {
-        if (!window.speechSynthesis.speaking) {
-          clearInterval(intervalId);
-          setSpeechInterval(null);
-          return;
-        }
-        window.speechSynthesis.pause();
-        window.speechSynthesis.resume();
-      }, 10000);
-      setSpeechInterval(intervalId);
     }
   };
 
-  // Clean up speech synthesis when component unmounts
-  useEffect(() => {
-    return () => {
-      window.speechSynthesis.cancel();
-      if (speechInterval) clearInterval(speechInterval);
-    };
-  }, [speechInterval]);
-
-  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -316,7 +163,6 @@ const forceVoiceLoad = () => {
       }
 
       try {
-        // Map language to BCP 47 language tag
         const langMap = {
           'english': 'en-US',
           'hindi': 'hi-IN',

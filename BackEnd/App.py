@@ -1,40 +1,38 @@
-import os
-from dotenv import load_dotenv
-import nest_asyncio
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import uvicorn
-
-# Import from your existing modules
+import os
+import uuid
+from gtts import gTTS
+from TTS import speak_text_colab
+from dotenv import load_dotenv
+import nest_asyncio
 from Model import chain
 from Translator import translate_text, translate_and_respond
 
-# Initialize environment and async support
+
 load_dotenv()
 nest_asyncio.apply()
 
-# Create FastAPI app
 app = FastAPI(title="Healthcare Assistant API")
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Update this in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# Define request model
 class HealthRequest(BaseModel):
     symptoms: str
     language_code: str = "en"
 
 
-# Define response model
 class HealthResponse(BaseModel):
     name: str
     remedies: List[str]
@@ -42,8 +40,10 @@ class HealthResponse(BaseModel):
     consult: List[str]
     original_language: str
 
+class TTSRequest(BaseModel):
+    text: str
+    language_code: str = "english"
 
-# Endpoints
 @app.get("/")
 async def root():
     return {"message": "Healthcare Assistant API"}
@@ -51,7 +51,6 @@ async def root():
 
 @app.get("/languages")
 async def get_languages():
-    # Common language codes
     languages = {
         "en": "english",
         "hi": "hindi",
@@ -77,10 +76,46 @@ async def translate_text_endpoint(text: str, src: str, dest: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during translation: {str(e)}")
 
+
+@app.post("/tts")
+async def text_to_speech(request: TTSRequest):
+    """Convert text to speech and return audio file"""
+    temp_file = None
+    try:
+        if not request.text.strip():
+            raise HTTPException(status_code=400, detail="Text cannot be empty")
+
+        # Simplified language mapping
+        language_map = {
+            "english": "en", "hindi": "hi", "bengali": "bn",
+            "telugu": "te", "tamil": "ta", "marathi": "mr",
+            "gujarati": "gu", "kannada": "kn", "malayalam": "ml",
+            "punjabi": "pa"
+        }
+
+        lang_code = language_map.get(request.language_code.lower(), "en")
+
+        os.makedirs("temp", exist_ok=True)
+        filename = f"audio_{uuid.uuid4()}.mp3"
+        temp_file = os.path.join("temp", filename)
+
+        # Directly use gTTS instead of the wrapper
+        tts = gTTS(text=request.text, lang=lang_code)
+        tts.save(temp_file)
+
+        return FileResponse(
+            path=temp_file,
+            media_type="audio/mpeg",
+            filename=filename
+        )
+    except Exception as e:
+        print(f"TTS error: {str(e)}")  # Print error for debugging
+        if temp_file and os.path.exists(temp_file):
+            os.remove(temp_file)
+        raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
 @app.post("/health-advice", response_model=HealthResponse)
 async def get_health_advice(request: HealthRequest):
     try:
-        # Map language names to ISO codes if needed
         language_map = {
             "english": "en",
             "hindi": "hi",
@@ -102,7 +137,5 @@ async def get_health_advice(request: HealthRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
 
-
-# Run the server
 if __name__ == "__main__":
-    uvicorn.run("App:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("App:app", host="127.0.0.1", port=8000, reload=True)
