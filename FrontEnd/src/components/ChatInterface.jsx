@@ -16,7 +16,7 @@ function ChatInterface({ language }) {
   const [micPermission, setMicPermission] = useState('prompt');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
-  const [voicesLoaded, setVoicesLoaded] = useState(false);
+  const [_voicesLoaded, setVoicesLoaded] = useState(false);
   const [speechInterval, setSpeechInterval] = useState(null);
 
   const messagesEndRef = useRef(null);
@@ -53,7 +53,7 @@ function ChatInterface({ language }) {
   };
 }, []);
   // Add this function to your component
-const forceVoiceLoad = () => {
+const _forceVoiceLoad = () => {
   // Create a silent utterance to force voice loading
   const utterance = new SpeechSynthesisUtterance('');
   utterance.volume = 0; // Silent
@@ -259,12 +259,12 @@ const forceVoiceLoad = () => {
     };
 
     // Handle speech error
-    utterance.onerror = (event) => {
+    /*utterance.onerror = (event) => {
       console.error("Speech error:", event);
       setIsSpeaking(false);
       setSpeakingMessageId(null);
       setError("Error speaking text");
-    };
+    };*/
 
     // Start speaking
     window.speechSynthesis.speak(utterance);
