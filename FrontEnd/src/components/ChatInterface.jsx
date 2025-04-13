@@ -73,63 +73,129 @@ function ChatInterface({ language }) {
   }, [t]);
 
   // Function to speak text
-  const speakText = (text, messageId) => {
-    // Stop any ongoing speech
-    window.speechSynthesis.cancel();
+const speakText = (text, messageId) => {
+  // Check if speech synthesis is supported
+  if (!window.speechSynthesis) {
+    console.error("Speech synthesis not supported");
+    setError("Speech synthesis not supported in your browser");
+    return;
+  }
 
-    if (isSpeaking && messageId === speakingMessageId) {
-      setIsSpeaking(false);
-      setSpeakingMessageId(null);
-      return;
-    }
+  // Stop any ongoing speech
+  window.speechSynthesis.cancel();
 
-    // Create speech synthesis utterance
-    const utterance = new SpeechSynthesisUtterance(text.replace(/\*\*/g, ''));
+  // Toggle off if already speaking this message
+  if (isSpeaking && messageId === speakingMessageId) {
+    setIsSpeaking(false);
+    setSpeakingMessageId(null);
+    return;
+  }
 
-    // Map language codes to BCP 47 language tags
-    const langMap = {
-      'english': 'en-IN',
-      'hindi': 'hi-IN',
-      'bengali': 'bn-IN',
-      'telugu': 'te-IN',
-      'tamil': 'ta-IN',
-      'marathi': 'mr-IN',
-      'gujarati': 'gu-IN',
-      'kannada': 'kn-IN',
-      'malayalam': 'ml-IN',
-      'punjabi': 'pa-IN'
-    };
+  // Clean text by removing markdown
+  const cleanText = text.replace(/\*\*/g, '').replace(/•/g, '');
+  console.log("Speaking text:", cleanText);
 
-    // Set language
-    utterance.lang = langMap[language.toLowerCase()] || 'en-US';
+  // Create speech synthesis utterance
+  const utterance = new SpeechSynthesisUtterance(cleanText);
 
-    // Set speaking states
-    setIsSpeaking(true);
-    setSpeakingMessageId(messageId);
+  // Get available voices
+  const voices = window.speechSynthesis.getVoices();
+  console.log("Available voices:", voices.length);
 
-    // Handle speech end
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      setSpeakingMessageId(null);
-    };
-
-    // Handle speech error
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      setSpeakingMessageId(null);
-    };
-
-    // Start speaking
-    window.speechSynthesis.speak(utterance);
+  // Map language codes to BCP 47 language tags
+  const langMap = {
+    'english': 'en',
+    'hindi': 'hi',
+    'bengali': 'bn',
+    'telugu': 'te',
+    'tamil': 'ta',
+    'marathi': 'mr',
+    'gujarati': 'gu',
+    'kannada': 'kn',
+    'malayalam': 'ml',
+    'punjabi': 'pa'
   };
 
+  // Get language code
+  const langCode = langMap[language.toLowerCase()] || 'en';
+  console.log("Selected language code:", langCode);
+
+  // Find a matching voice
+  const matchingVoice = voices.find(v => v.lang.startsWith(langCode));
+  if (matchingVoice) {
+    console.log("Using voice:", matchingVoice.name);
+    utterance.voice = matchingVoice;
+  } else {
+    console.log("No matching voice found, using default");
+  }
+
+  // Set language (even if no matching voice)
+  utterance.lang = langCode;
+
+  // Set rate and pitch for better understanding
+  utterance.rate = 0.9;  // slightly slower
+  utterance.pitch = 1.0; // normal pitch
+
+  // Set speaking states
+  setIsSpeaking(true);
+  setSpeakingMessageId(messageId);
+
+  // Handle speech end
+  utterance.onend = () => {
+    console.log("Speech ended");
+    setIsSpeaking(false);
+    setSpeakingMessageId(null);
+  };
+
+  // Handle speech error
+  utterance.onerror = (event) => {
+    console.error("Speech error:", event);
+    setIsSpeaking(false);
+    setSpeakingMessageId(null);
+    setError("Error speaking text");
+  };
+
+  // Start speaking
+  window.speechSynthesis.speak(utterance);
+  console.log("Speech started");
+};
   // Clean up speech synthesis when component unmounts
   useEffect(() => {
     return () => {
       window.speechSynthesis.cancel();
     };
   }, []);
+  useEffect(() => {
+  // Check speech synthesis support
+  if (!window.speechSynthesis) {
+    console.error("Speech synthesis not supported");
+    return;
+  }
 
+  // Function to log available voices
+  const logVoices = () => {
+    const voices = window.speechSynthesis.getVoices();
+    console.log("Voices loaded:", voices.length);
+
+    // Log languages with voice support
+    const langSupport = {};
+    voices.forEach(voice => {
+      const lang = voice.lang.split('-')[0];
+      langSupport[lang] = true;
+    });
+    console.log("Languages with voice support:", Object.keys(langSupport));
+  };
+
+  // Load voices (may be async in some browsers)
+  window.speechSynthesis.onvoiceschanged = logVoices;
+
+  // Try to get voices immediately (works in Firefox)
+  logVoices();
+
+  return () => {
+    window.speechSynthesis.cancel();
+  };
+}, []);
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
