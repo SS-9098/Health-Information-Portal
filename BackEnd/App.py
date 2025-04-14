@@ -20,12 +20,8 @@ app = FastAPI(title="Healthcare Assistant API")
 
 # Add CORS middleware
 # Add CORS middleware with proper production configuration
-origins = [
-    "http://localhost:3000",           # Local React development server
-    "http://localhost:5173",           # Vite default development server
-    "https://health-information-portal.vercel.app",  # Production frontend URL
-    "https://health-advice-api.onrender.com",       # API URL itself (for same-origin requests)
-]
+origins = ["*"]
+
 
 app.add_middleware(
     CORSMiddleware,
