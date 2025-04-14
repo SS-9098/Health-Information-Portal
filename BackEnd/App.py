@@ -52,7 +52,8 @@ class HealthResponse(BaseModel):
 
 
 # Endpoints
-@app.get("/")
+@app.get("/", include_in_schema=True)
+@app.head("/", include_in_schema=True)
 async def root():
     return {"message": "Healthcare Assistant API"}
 
