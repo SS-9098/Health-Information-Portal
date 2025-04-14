@@ -31,7 +31,7 @@ app.add_middleware(
 # Define request model
 class HealthRequest(BaseModel):
     symptoms: str
-    language_code: str = "en"
+    language: str = "english"
 
 
 # Define response model
@@ -94,7 +94,7 @@ async def get_health_advice(request: HealthRequest):
             "punjabi": "pa"
         }
 
-        lang_code = language_map.get(request.language_code.lower(), request.language_code)
+        lang_code = language_map.get(request.language.lower())
 
         result = await translate_and_respond(request.symptoms, lang_code, chain)
         result["original_language"] = lang_code
