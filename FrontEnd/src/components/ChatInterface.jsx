@@ -3,7 +3,7 @@
   import LoadingIndicator from './LoadingIndicator';
   import translations from '../utils/translations';
 
-  const API_URL = 'https://health-advice-api.onrender.com';
+  const API_URL = 'https://health-information-portal.onrender.com'; // Update this to your API URL
 
   function ChatInterface({ language }) {
     const navigate = useNavigate();
