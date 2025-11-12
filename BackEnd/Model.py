@@ -14,7 +14,7 @@ nest_asyncio.apply()
 # Initialize Groq chat model
 llm = ChatGroq(
     groq_api_key = os.environ["GROQ_API_KEY"],
-    model_name = "llama3-8b-8192",
+    model_name = "llama-3.1-8b-instant",
 )
 
 parser = JsonOutputParser(pydantic_object={
